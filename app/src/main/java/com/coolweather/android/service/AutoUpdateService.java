@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.bumptech.glide.util.Util;
 import com.coolweather.android.gson.Weather;
@@ -34,7 +35,7 @@ public class AutoUpdateService extends Service {
         updateWeather();
         updateBingPic();
         AlarmManager manager=(AlarmManager)getSystemService(ALARM_SERVICE);
-        int anHour=8*60*1000;//这是8小时的毫秒数
+        int anHour=3000;//这是8小时的毫秒数
         long triggerAtTime= SystemClock.elapsedRealtime()+anHour;
         Intent i=new Intent(this,AutoUpdateService.class);
         PendingIntent pi=PendingIntent.getService(this,0,i,0);
@@ -71,6 +72,8 @@ public class AutoUpdateService extends Service {
                     }
                 }
             });
+
+            Log.d("testService","Command");
         }
     }
 
@@ -87,13 +90,11 @@ public class AutoUpdateService extends Service {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String bingPic=response.body().string();
-                Weather weather= Utility.handleWeatherResponse(bingPic);
-                if(weather!=null && "ok".equals(weather.status)){
-                    SharedPreferences.Editor editor=PreferenceManager.
-                            getDefaultSharedPreferences(AutoUpdateService.this).edit();
-                    editor.putString("bing_pic",bingPic);
-                    editor.apply();
-                }
+                Log.d("bingPic",bingPic);
+                SharedPreferences.Editor editor=PreferenceManager.
+                        getDefaultSharedPreferences(AutoUpdateService.this).edit();
+                editor.putString("bing_pic",bingPic);
+                editor.apply();
             }
         });
     }
